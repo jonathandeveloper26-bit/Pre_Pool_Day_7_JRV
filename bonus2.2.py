@@ -24,11 +24,11 @@ def most_frequent_char(word):
             most_frequent_count = word.count(char)
             most_frequent = char
         if word.count(char) == most_frequent_count:
-            if most_frequent < char:
+            if most_frequent > char:
                 most_frequent = char
         else:
             continue
     return most_frequent
 
-print(most_frequent_char("heeello"))
+print(most_frequent_char("hellooooaaaa"))
 
