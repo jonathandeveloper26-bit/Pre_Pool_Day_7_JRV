@@ -11,10 +11,19 @@ parser.add_argument("--ap", type=int, help= "Allowed Penalties")
 parser.add_argument("--tb", type=bool, help= "Boolean for time")
 parser.add_argument("--ts", type=int, help= "Time Limit (in seconds)")
 parser.add_argument("--wl", type=int, help="Word Length")
+parser.add_argument("--f", type=str, help="File Name - including extension")
 
 args = parser.parse_args()
 
-
+### Returns a random word from 'file_name'.txt
+def get_word_from_file(file_name, length):
+    words = []
+    with open(file_name, "r") as f:
+        for line in f:
+            for w in line.split():
+                words.append(w)
+    return random.choice([word for word in list(words) if len(word) == length])
+    
 ### Check User Attempts. If attempts >= 12 (by default), they lose. Otherwise, they continue.
 def check_attempts(atmpt, allowed = 12):
     if atmpt >= allowed: 
@@ -44,6 +53,7 @@ def get_allowed_penalties():
         else:
             print(f"{user_choice} is an invalid option. Try again.")
 
+### Gets the time limits
 def get_time_limit():
     time_limit_bool = False
     time_limit_s = 0
@@ -75,8 +85,26 @@ def generate_pairs(string):
 
 ### gets a random (lower-case) english word of length (chosen by user)
 def get_random_word(length):
-    from english_words import get_english_words_set
-    return random.choice([words for words in list(get_english_words_set(['web2'],lower=True)) if len(words) == length])
+    options = ["random", "ocean", "plants", "space", "travel", "vehicles", "custom"]
+    user_input = ""
+    while True:
+        try:
+            user_input = args.f if args.f else input("Do you have a theme (Random, Plants, Space, Travel, Vehicles, Custom) in mind? ").lower()
+            user_input = user_input.replace(".txt", "")
+            if user_input in options:
+                if user_input == "random":
+                    from english_words import get_english_words_set
+                    return random.choice([words for words in list(get_english_words_set(['web2'],lower=True)) if len(words) == length])
+                elif user_input != "random" and user_input != "custom":
+                    return get_word_from_file(user_input + ".txt", length)
+                elif user_input == "custom":
+                    user_input = input("Enter your file name (.txt only): ")
+                    return get_word_from_file(user_input + ".txt", length)
+
+            else:
+                print(f"You have entered {user_input} which is an invalid option. Try again.")
+        except:
+            print("An Error has Occurred.")
 
 ### updates the '_ ' paris according to the user guess.
 def update_pairs(pairs, user_guess, word):
@@ -159,7 +187,7 @@ game_finished = False
 guesses_letters = set()
 guesses_words = set()
 
-### Initialie Word and Pairs
+### Initialize Word and Pairs
 
 word_length = args.wl if args.wl else get_word_length()
 word = get_random_word(word_length)
